@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Bot</h1>
+        <div id="chatbox">
+            <div id="chat-log"></div>
+            <input id="chat-input" type="text" placeholder="Type your message...">
+            <button id="send-btn">Send</button>
+        </div>
+        <button id="contents-btn">Contents</button>
+        <div class="footer">
+            <a href="https://www.linkedin.com/in/your-linkedin" target="_blank">LinkedIn</a>
+            <a href="https://github.com/your-github" target="_blank">GitHub</a>
+        </div>
+    </div>
+    <style>
+        body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+    color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+    font-size: 3em;
+    color: #00bcd4;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+#chatbox {
+    background-color: #1e272e;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+}
+
+#chat-log {
+    height: 300px;
+    overflow-y: scroll;
+    padding: 10px;
+    background-color: #2f3640;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    color: #dcdde1;
+    border: 1px solid #7f8fa6;
+}
+
+#chat-input {
+    width: calc(100% - 70px);
+    padding: 10px;
+    border: 1px solid #4cd137;
+    border-radius: 5px;
+    margin-right: 10px;
+    background-color: #dcdde1;
+    color: #2f3640;
+}
+
+#send-btn {
+    padding: 10px;
+    background-color: #4cd137;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+#send-btn:hover {
+    background-color: #44bd32;
+}
+
+#contents-btn {
+    padding: 10px;
+    background-color: #00bcd4;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+#contents-btn:hover {
+    background-color: #0097a7;
+}
+
+.footer {
+    margin-top: 20px;
+}
+
+.footer a {
+    color: #00bcd4;
+    text-decoration: none;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #0097a7;
+    text-decoration: underline;
+}
+
+    </style>
+    <script>document.addEventListener('DOMContentLoaded', function() {
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const chatLog = document.getElementById('chat-log');
+    
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    
+        function sendMessage() {
+            const userMessage = chatInput.value;
+            if (userMessage.trim() === '') return;
+    
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.textContent = 'You: ' + userMessage;
+            chatLog.appendChild(userMessageDiv);
+    
+            chatInput.value = '';
+    
+            fetch('/get_response', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: userMessage })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const botMessageDiv = document.createElement('div');
+                botMessageDiv.textContent = 'Bot: ' + data.response;
+                chatLog.appendChild(botMessageDiv);
+                chatLog.scrollTop = chatLog.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    });
+    </script>
+</body>
+</html>
